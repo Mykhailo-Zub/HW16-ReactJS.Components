@@ -84,57 +84,28 @@ export default class Contacts extends Component {
         });
     };
 
-    addGenderImg = (contact) => {
-        if (contact.gender === "male") {
+    addGenderImg = (gender) => {
+        if (gender === "male") {
             return maleImg;
-        } else if (contact.gender === "female") {
+        } else if (gender === "female") {
             return femaleImg;
         } else {
             return unknownImg;
         }
     };
 
-    handleMaleChange = (e) => {
+    handleGenderChange = (e) => {
         this.setState({
+            ...this.state,
             [e.target.name]: e.target.checked,
-            contacts: contacts.filter((el) => {
-                return (
-                    el.male.toString().includes(`${!this.state.male}`) ||
-                    el.female.toString().includes(`${this.state.female}`) ||
-                    el.notSpecified
-                        .toString()
-                        .includes(`${this.state.notSpecified}`)
-                );
-            }),
-        });
-    };
-
-    handleFemaleChange = (e) => {
-        this.setState({
-            [e.target.name]: e.target.checked,
-            contacts: contacts.filter((el) => {
-                return (
-                    el.male.toString().includes(`${this.state.male}`) ||
-                    el.female.toString().includes(`${!this.state.female}`) ||
-                    el.notSpecified
-                        .toString()
-                        .includes(`${this.state.notSpecified}`)
-                );
-            }),
-        });
-    };
-
-    handleNotSpecifiedChange = (e) => {
-        this.setState({
-            [e.target.name]: e.target.checked,
-            contacts: contacts.filter((el) => {
-                return (
-                    el.male.toString().includes(`${this.state.male}`) ||
-                    el.female.toString().includes(`${this.state.female}`) ||
-                    el.notSpecified
-                        .toString()
-                        .includes(`${!this.state.notSpecified}`)
-                );
+            contacts: this.state.contacts.filter((el) => {
+                if (this.state.notSpecified) {
+                    return el.gender === undefined;
+                } else if (this.state.female) {
+                    return el.gender === "female";
+                } else if (this.state.male) {
+                    return el.gender === "male";
+                } else return;
             }),
         });
     };
@@ -156,7 +127,7 @@ export default class Contacts extends Component {
                             name="male"
                             id="male"
                             checked={this.state.male}
-                            onChange={this.handleMaleChange}
+                            onChange={this.handleGenderChange}
                         />
                         Male
                     </label>
@@ -166,7 +137,7 @@ export default class Contacts extends Component {
                             name="female"
                             id="female"
                             checked={this.state.female}
-                            onChange={this.handleFemaleChange}
+                            onChange={this.handleGenderChange}
                         />
                         Female
                     </label>
@@ -176,22 +147,24 @@ export default class Contacts extends Component {
                             name="notSpecified"
                             id="notSpecefied"
                             checked={this.state.notSpecified}
-                            onChange={this.handleNotSpecifiedChange}
+                            onChange={this.handleGenderChange}
                         />
                         Not specified
                     </label>
                 </div>
-                {this.state.contacts.map((contact) => {
-                    return (
-                        <Contact
-                            firstName={contact.firstName}
-                            lastName={contact.lastName}
-                            phone={contact.phone}
-                            gender={this.addGenderImg(contact)}
-                            key={contact.phone}
-                        />
-                    );
-                })}
+                {this.state.contacts.map(
+                    ({ firstName, lastName, phone, gender }) => {
+                        return (
+                            <Contact
+                                firstName={firstName}
+                                lastName={lastName}
+                                phone={phone}
+                                gender={this.addGenderImg(gender)}
+                                key={phone}
+                            />
+                        );
+                    }
+                )}
             </div>
         );
     }
